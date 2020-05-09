@@ -1,0 +1,4 @@
+{
+  "mongoURI": "mongodb+srv://fabio123:fabio123@contactkeepercluster-2gdid.mongodb.net/test?retryWrites=true&w=majority",
+  "jwtSecret": "superSecret-jwttokenmsecrtet1235g4gf5g454gfd45g45r5g445reg54r45e54gre54ger54gererg5re5ge4543534648@#$%^"
+}
