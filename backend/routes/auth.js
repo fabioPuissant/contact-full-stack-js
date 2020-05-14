@@ -5,12 +5,22 @@ const bcrypt = require("bcryptjs");
 const { check, validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const config = require("../config/default.json");
+const auth = require("../middleware/auth");
 
 // @route   GET api/auth
 // @desc    Get logged in user
 // @access  Private
-router.get("/", (req, res) => {
-  res.send("Get logged in user");
+router.get("/", auth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId)
+      .select("-password, -__v")
+      .select("-_id");
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    req.status(500).send("Server Error");
+  }
 });
 
 // @route   POST api/auth
@@ -34,12 +44,12 @@ router.post(
       let user = await User.findOne({ email });
 
       if (!user) {
-        return res.status(400).json({ msg: "Invalid Credentials" });
+        return res.status(400).send("Invalid Credentials");
       }
 
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
-        return res.status(400).json({ msg: "Invalid Credentials" });
+        return res.status(400).send("Invalid Credentials");
       }
 
       const payload = {
@@ -55,7 +65,9 @@ router.post(
         if (err) throw err;
         res.json({ token });
       });
-    } catch (err) {}
+    } catch (err) {
+      console.log(`Error while trying to sign token: ${error}`);
+    }
   }
 );
 
